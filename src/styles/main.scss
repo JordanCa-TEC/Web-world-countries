@@ -1,0 +1,40 @@
+// --- src/styles/main.scss ---
+@import "variables";
+
+// src/styles/main.scss
+body {
+  background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: blue;
+}
+
+
+.home {
+  .search-bar {
+    margin-bottom: 20px;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .country-list {
+    list-style: none;
+
+    li {
+      margin: 5px 0;
+      a {
+        text-decoration: none;
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+.country-details,
+.country-risk {
+  img {
+    max-width: 100%;
+  }
+}
