@@ -2,17 +2,16 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import CountryDetails from "./pages/CountryDetails";
-import CountryRisk from "./pages/CountryRisk";
+import CountryAbout from "./pages/CountryAbout";
 
 const App = () => (
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/country/:code" element={<CountryDetails />} />
-      <Route path="/country/:code/risk" element={<CountryRisk />} />
+      <Route path="/about" element={<CountryAbout />} />
     </Routes>
   </BrowserRouter>
 );
 
 export default App;
-
