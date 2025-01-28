@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   decrement,
@@ -15,7 +15,13 @@ export function Counter() {
   const dispatch = useDispatch();
   const [incrementAmount, setIncrementAmount] = useState('2');
 
-  const incrementValue = Number(incrementAmount) || 0;
+  // Asegúrate de que el valor de incremento sea un número
+  const incrementValue = isNaN(Number(incrementAmount)) ? 0 : Number(incrementAmount);
+
+  // Función de manejo del cambio en el input
+  const handleIncrementAmountChange = useCallback((e) => {
+    setIncrementAmount(e.target.value);
+  }, []);
 
   return (
     <div>
@@ -41,7 +47,7 @@ export function Counter() {
           className={styles.textbox}
           aria-label="Set increment amount"
           value={incrementAmount}
-          onChange={(e) => setIncrementAmount(e.target.value)}
+          onChange={handleIncrementAmountChange}
         />
         <button
           className={styles.button}

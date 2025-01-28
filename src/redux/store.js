@@ -7,3 +7,5 @@ export const store = configureStore({
     countries: countriesReducer,
   },
 });
+
+export default store;

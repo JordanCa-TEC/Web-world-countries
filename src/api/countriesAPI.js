@@ -14,17 +14,22 @@ const handleError = (error) => {
   console.error('Error al realizar la solicitud:', error.message);
   if (error.response) {
     console.error('Detalles del error:', error.response.data);
+  } else if (error.request) {
+    console.error('No se recibió respuesta del servidor:', error.request);
+  } else {
+    console.error('Error al configurar la solicitud:', error.message);
   }
-  throw error; 
+  throw new Error(error.response?.data?.message || 'Error en la solicitud');
 };
 
 // Función para obtener todos los países
 export const fetchCountries = async () => {
   try {
     const response = await apiClient.get('/all');
-    return response.data; 
+    console.log('Países obtenidos:', response.data); // Log para depuración
+    return response.data;
   } catch (error) {
-    handleError(error); 
+    handleError(error);
   }
 };
 
@@ -32,6 +37,7 @@ export const fetchCountries = async () => {
 export const fetchCountryDetails = async (countryCode) => {
   try {
     const response = await apiClient.get(`/alpha/${countryCode}`);
+    console.log(`Detalles del país (${countryCode}):`, response.data); // Log para depuración
     return response.data;
   } catch (error) {
     handleError(error);
@@ -42,8 +48,9 @@ export const fetchCountryDetails = async (countryCode) => {
 export const fetchCountryRisk = async (countryCode) => {
   try {
     const response = await axios.get(
-      `https://api.example.com/risk/${countryCode}`
+      `https://api.example.com/risk/${countryCode}` // Endpoint de ejemplo
     );
+    console.log(`Riesgo del país (${countryCode}):`, response.data); // Log para depuración
     return response.data;
   } catch (error) {
     handleError(error);
@@ -51,4 +58,3 @@ export const fetchCountryRisk = async (countryCode) => {
 };
 
 export default apiClient;
-
