@@ -1,90 +1,102 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchCountries, fetchCountryDetails, fetchCountryRisk } from "../../api/countriesAPI";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
+// Estado inicial
 const initialState = {
-  countries: [],
-  selectedCountry: null,
-  countryRisk: null,
-  loading: false,
-  error: null,
+  countries: [],        // Lista de todos los países
+  countryDetails: null, // Detalles de un país específico
+  status: 'idle',       // Estado de la solicitud (idle, loading, failed)
+  error: null,          // Para manejar los errores
 };
 
-// Cargar países
-export const loadCountries = createAsyncThunk(
-  "countries/load",
-  async (_, { rejectWithValue }) => {
+// Función para obtener todos los países
+const fetchCountryByName = async () => {
+  try {
+    const response = await axios.get('https://restcountries.com/v3.1/all');
+    return response.data;
+  } catch (error) {
+    throw new Error('No se pudo obtener la lista de países: ' + error.message);
+  }
+};
+
+// Función para obtener detalles de un país por código
+const fetchCountryByCode = async (code) => {
+  try {
+    const response = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('No se pudo obtener los detalles del país: ' + error.message);
+  }
+};
+
+// Acción asincrónica para obtener todos los países
+export const fetchAllCountries = createAsyncThunk(
+  'countries/fetchAllCountries',
+  async () => {
     try {
-      const response = await fetchCountries();
-      console.log("Datos de la API (loadCountries):", response.data); // Debug
-      return response.data; // Asegúrate de que sea un array de países
+      const response = await fetchCountryByName();
+      return response; // Devuelve la lista de países
     } catch (error) {
-      console.error("Error al cargar países:", error.message); // Debug
-      return rejectWithValue(error.message);
+      throw new Error('No se pudo obtener la lista de países: ' + error.message);
     }
   }
 );
 
-// Cargar detalles de un país
-export const loadCountryDetails = createAsyncThunk(
-  "countryDetails/load",
-  async (countryCode, { rejectWithValue }) => {
+// Acción asincrónica para obtener detalles de un país por código
+export const fetchCountryDetails = createAsyncThunk(
+  'countries/fetchCountryDetails',
+  async (code) => {
     try {
-      const response = await fetchCountryDetails(countryCode);
-      console.log("Detalles del país:", response.data); // Debug
-      return response.data;
+      const response = await fetchCountryByCode(code);
+      return response;
     } catch (error) {
-      console.error("Error al cargar detalles del país:", error.message); // Debug
-      return rejectWithValue(error.message);
+      throw new Error('No se pudo obtener los detalles del país: ' + error.message);
     }
   }
 );
 
-// Cargar riesgo del país
-export const loadCountryRisk = createAsyncThunk(
-  "countryRisk/load",
-  async (countryCode, { rejectWithValue }) => {
-    try {
-      const response = await fetchCountryRisk(countryCode);
-      console.log("Riesgo del país:", response.data); // Debug
-      return response.data;
-    } catch (error) {
-      console.error("Error al cargar el riesgo del país:", error.message); // Debug
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
-const countriesSlice = createSlice({
-  name: "countries",
+// Slice de los países
+export const countriesSlice = createSlice({
+  name: 'countries',
   initialState,
-  reducers: {}, // No se necesitan reducers locales en este caso
+  reducers: {
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(loadCountries.pending, (state) => {
-        state.loading = true;
+      .addCase(fetchAllCountries.pending, (state) => {
+        state.status = 'loading';
         state.error = null;
       })
-      .addCase(loadCountries.fulfilled, (state, action) => {
-        state.loading = false;
-        state.countries = action.payload; // Actualizar la lista de países
+      .addCase(fetchAllCountries.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.countries = action.payload;
       })
-      .addCase(loadCountries.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload; // Guardar el error
+      .addCase(fetchAllCountries.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
       })
-      .addCase(loadCountryDetails.fulfilled, (state, action) => {
-        state.selectedCountry = action.payload; // Actualizar el país seleccionado
+      .addCase(fetchCountryDetails.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
       })
-      .addCase(loadCountryRisk.fulfilled, (state, action) => {
-        state.countryRisk = action.payload; // Actualizar el riesgo del país
+      .addCase(fetchCountryDetails.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.countryDetails = action.payload;
       })
-      .addCase(loadCountryDetails.rejected, (state, action) => {
-        state.error = action.payload;
-      })
-      .addCase(loadCountryRisk.rejected, (state, action) => {
-        state.error = action.payload;
+      .addCase(fetchCountryDetails.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
       });
   },
 });
+
+export const { setError } = countriesSlice.actions;
+export const selectCountries = (state) => state.countries.countries;
+export const selectCountryDetails = (state) => state.countries.countryDetails;
+export const selectCountriesStatus = (state) => state.countries.status;
+export const selectCountriesError = (state) => state.countries.error;
 
 export default countriesSlice.reducer;

@@ -1,25 +1,26 @@
-// --- src/pages/Home.jsx ---
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { loadCountries } from "../redux/slices/countriesSlice";
+import { fetchAllCountries } from "../redux/slices/countriesSlice";
 import SearchBar from "../components/SearchBar";
 import { Link } from "react-router-dom";
 import "../styles/main.scss";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { countries, loading } = useSelector((state) => state.countries);
+  const { countries, status, error } = useSelector((state) => state.countries);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    dispatch(loadCountries());
+    dispatch(fetchAllCountries());
   }, [dispatch]);
 
-  const filteredCountries = countries.filter((country) =>
-    country.name.common.toLowerCase().includes(search.toLowerCase())
-  );
+  if (status === "loading") return <p>Cargando países...</p>;
+  if (status === "failed") return <p>Error al cargar los países: {error}</p>;
 
-  if (loading) return <p>Cargando países...</p>;
+  const filteredCountries =
+    countries?.filter((country) =>
+      country.name?.common?.toLowerCase().includes(search.toLowerCase())
+    ) || [];
 
   return (
     <div className="home">
@@ -50,11 +51,11 @@ const Home = () => {
         {filteredCountries.map((country) => (
           <div key={country.cca3} className="flag-card">
             <img
-              src={country.flags.svg}
-              alt={`Bandera de ${country.name.common}`}
+              src={country.flags?.svg || country.flags?.png || ""}
+              alt={`Bandera de ${country.name?.common || "desconocido"}`}
               className="flag-image"
             />
-            <p className="country-name">{country.name.common}</p>
+            <p className="country-name">{country.name?.common || "Nombre no disponible"}</p>
           </div>
         ))}
       </div>
