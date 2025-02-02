@@ -9,33 +9,13 @@ const initialState = {
   error: null,          // Para manejar los errores
 };
 
-// Función para obtener todos los países
-const fetchCountryByName = async () => {
-  try {
-    const response = await axios.get('https://restcountries.com/v3.1/all');
-    return response.data;
-  } catch (error) {
-    throw new Error('No se pudo obtener la lista de países: ' + error.message);
-  }
-};
-
-// Función para obtener detalles de un país por código
-const fetchCountryByCode = async (code) => {
-  try {
-    const response = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`);
-    return response.data;
-  } catch (error) {
-    throw new Error('No se pudo obtener los detalles del país: ' + error.message);
-  }
-};
-
 // Acción asincrónica para obtener todos los países
 export const fetchAllCountries = createAsyncThunk(
   'countries/fetchAllCountries',
   async () => {
     try {
-      const response = await fetchCountryByName();
-      return response; // Devuelve la lista de países
+      const response = await axios.get('https://restcountries.com/v3.1/all');
+      return response.data;
     } catch (error) {
       throw new Error('No se pudo obtener la lista de países: ' + error.message);
     }
@@ -47,8 +27,8 @@ export const fetchCountryDetails = createAsyncThunk(
   'countries/fetchCountryDetails',
   async (code) => {
     try {
-      const response = await fetchCountryByCode(code);
-      return response;
+      const response = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`);
+      return response.data[0]; // Tomamos solo el primer objeto del array
     } catch (error) {
       throw new Error('No se pudo obtener los detalles del país: ' + error.message);
     }
@@ -84,7 +64,7 @@ export const countriesSlice = createSlice({
       })
       .addCase(fetchCountryDetails.fulfilled, (state, action) => {
         state.status = 'idle';
-        state.countryDetails = action.payload;
+        state.countryDetails = action.payload; // Ya está asegurado que es un solo objeto
       })
       .addCase(fetchCountryDetails.rejected, (state, action) => {
         state.status = 'failed';

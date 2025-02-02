@@ -17,47 +17,37 @@ const Home = () => {
   if (status === "loading") return <p>Cargando países...</p>;
   if (status === "failed") return <p>Error al cargar los países: {error}</p>;
 
-  const filteredCountries =
-    countries?.filter((country) =>
-      country.name?.common?.toLowerCase().includes(search.toLowerCase())
-    ) || [];
+  const filteredCountries = countries
+    ? countries.filter((country) =>
+        country.name?.common?.toLowerCase().includes(search.toLowerCase())
+      )
+    : [];
 
   return (
     <div className="home">
-      {/* Barra de búsqueda grande */}
       <div className="search-bar-container">
-        <SearchBar
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Busca un país..."
-        />
+        <SearchBar value={search} onChange={setSearch} placeholder="Busca un país..." />
       </div>
 
-      {/* Botones de navegación */}
       <div className="navigation-buttons">
-        <Link to="/continents" className="nav-button">
-          Continentes
-        </Link>
-        <Link to="/favorites" className="nav-button">
-          Favoritos
-        </Link>
-        <Link to="/about" className="nav-button">
-          Acerca de
-        </Link>
+        <Link to="/about" className="nav-button">Acerca de</Link>
       </div>
 
-      {/* Desglose de todas las banderas */}
       <div className="flags-container">
-        {filteredCountries.map((country) => (
-          <div key={country.cca3} className="flag-card">
-            <img
-              src={country.flags?.svg || country.flags?.png || ""}
-              alt={`Bandera de ${country.name?.common || "desconocido"}`}
-              className="flag-image"
-            />
-            <p className="country-name">{country.name?.common || "Nombre no disponible"}</p>
-          </div>
-        ))}
+        {filteredCountries.length > 0 ? (
+          filteredCountries.map((country) => (
+            <Link key={country.cca3} to={`/country/${country.cca3}`} className="flag-card">
+              <img
+                src={country.flags?.svg || country.flags?.png || ""}
+                alt={`Bandera de ${country.name?.common || "desconocido"}`}
+                className="flag-image"
+              />
+              <p className="country-name">{country.name?.common || "Nombre no disponible"}</p>
+            </Link>
+          ))
+        ) : (
+          <p>No se encontraron países.</p>
+        )}
       </div>
     </div>
   );

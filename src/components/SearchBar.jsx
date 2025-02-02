@@ -1,7 +1,6 @@
-// --- src/components/SearchBar.jsx ---
 import React from "react";
 
-const SearchBar = ({ value, onChange }) => {
+const SearchBar = ({ value = "", onChange = () => {} }) => {
   return (
     <input
       type="text"

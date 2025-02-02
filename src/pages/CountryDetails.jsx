@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCountryDetails } from "../redux/slices/countriesSlice"; // Acción correcta
+import { fetchCountryDetails } from "../redux/slices/countriesSlice";
 import { useParams } from "react-router-dom";
 
 const CountryDetails = () => {
@@ -8,7 +8,7 @@ const CountryDetails = () => {
   const dispatch = useDispatch();
   
   // Accedemos al estado del país seleccionado y su estado de carga
-  const { selectedCountry, status, error } = useSelector((state) => state.countries);
+  const { countryDetails, status, error } = useSelector((state) => state.countries);
 
   useEffect(() => {
     if (code) {
@@ -18,7 +18,9 @@ const CountryDetails = () => {
 
   if (status === "loading") return <p>Cargando información del país...</p>;
   if (status === "failed") return <p>Error al cargar la información: {error}</p>;
-  if (!selectedCountry) return <p>No se encontró información para este país.</p>;
+  if (!countryDetails) return <p>No se encontró información para este país.</p>;
+
+  console.log("Detalles del país:", countryDetails); // Depuración
 
   // Desestructuramos los datos del país para su visualización
   const {
@@ -31,7 +33,7 @@ const CountryDetails = () => {
     region,
     languages,
     currencies,
-  } = selectedCountry;
+  } = countryDetails;
 
   return (
     <div className="country-details">
