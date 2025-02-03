@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchAllCountries } from "../redux/slices/countriesSlice";
 import SearchBar from "../components/SearchBar";
 import { Link } from "react-router-dom";
+import logo from '../assets/LOGO-WORLD-SEEK.svg';
 import "../styles/main.scss";
 
 const Home = () => {
@@ -25,6 +26,9 @@ const Home = () => {
 
   return (
     <div className="home">
+      <div className="logo-worldseek">
+      <img src={logo} alt="logo worldseek" />
+      </div>
       <div className="search-bar-container">
         <SearchBar value={search} onChange={setSearch} placeholder="Busca un país..." />
       </div>
