@@ -1,0 +1,95 @@
+// mixins 
+@mixin tablet {
+    @media only screen and (max-width: 768px) {
+      @content;
+    }
+  }
+
+/*----------------------------------------*/
+.country-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "name name"
+      "flag area"
+      "flag population"
+      "flag timezone"
+      "capital region"
+      "languages currencies"
+      "map map";
+    gap: 30px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    background: #f7f9fa;
+    padding: 0 20px 10% 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    @include tablet{
+        gap: 0;
+        padding: 0 0 40% 0;
+        margin: 0;
+    }
+  
+    h1 {
+        grid-area: name;
+        font-size: 4em;
+        color: #fff; 
+        text-align: center;
+        padding: 20px 0 20px 0;
+        background: #636363;  
+        width: 100%; 
+        display: flex;
+        justify-content: center;
+    }
+  
+    img {
+      grid-area: flag;
+      width: 100%;
+      max-width: 580px;
+      border-radius: 10px;
+    }
+  
+    p {
+      background: #c4c4c4;
+      font-size: 1.7rem;
+      padding: 4%;
+      border-radius: 5px;
+
+      @include tablet{
+        padding: 3% 90% 3% 90%;
+      }
+    }
+  
+    p:nth-child(3) { grid-area: area; }
+    p:nth-child(4) { grid-area: population; }
+    p:nth-child(5) { grid-area: timezone; }
+    p:nth-child(6) { grid-area: capital; }
+    p:nth-child(7) { grid-area: region; }
+    p:nth-child(8) { grid-area: languages; }
+    p:nth-child(9) { grid-area: currencies; }
+
+    // 🔹 Estilos del mapa
+    .map-container {
+      grid-area: map;
+      width: 100%;
+      height: 400px;  // Ajusta la altura según lo necesites
+      border-radius: 10px;
+      overflow: hidden;
+      
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    }
+  
+    @include tablet {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+}
