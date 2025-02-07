@@ -1,34 +1,38 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { fetchCountries } from './api/countriesAPI';
 
+jest.mock('./api/countriesAPI');
 
-// Mock de las funciones de la API
-jest.mock('./api/countriesAPI', () => ({
-  fetchCountries: jest.fn().mockResolvedValue({ data: [] }), 
-  fetchCountryDetails: jest.fn(),
-  fetchCountryRisk: jest.fn(),
-}));
-
-
-test('renders countries data', async () => {
-  const { getByText } = render(
+const renderWithProviders = (ui) => {
+  return render(
     <Provider store={store}>
-      <App />
+      <BrowserRouter>{ui}</BrowserRouter>
     </Provider>
   );
+};
 
- 
-  expect(screen.getByText(/learn react link/i)).toBeInTheDocument();
+// Limpiar mocks antes de cada prueba
+beforeEach(() => {
+  jest.clearAllMocks();
 });
 
-import { render, screen } from '@testing-library/react';
-import App from './App';
+test('Muestra mensaje cuando no hay países disponibles', async () => {
+  fetchCountries.mockResolvedValueOnce({ data: [] });
 
-test('renders learn react link', () => {
-  render(<App />);
+  renderWithProviders(<App />);
+
+  const emptyMessage = await screen.findByText(/no countries available/i);
+  expect(emptyMessage).toBeInTheDocument();
+});
+
+test('Muestra el enlace "Learn React"', () => {
+  renderWithProviders(<App />);
+
   const linkElement = screen.getByText(/learn react/i);
   expect(linkElement).toBeInTheDocument();
 });
