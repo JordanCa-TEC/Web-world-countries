@@ -8,6 +8,7 @@ import { fetchCountries } from './api/countriesAPI';
 
 jest.mock('./api/countriesAPI');
 
+// Función reutilizable para renderizar con Redux y React Router
 const renderWithProviders = (ui) => {
   return render(
     <Provider store={store}>
@@ -21,18 +22,20 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-test('Muestra mensaje cuando no hay países disponibles', async () => {
-  fetchCountries.mockResolvedValueOnce({ data: [] });
+describe('App Component', () => {
+  test('Muestra mensaje cuando no hay países disponibles', async () => {
+    fetchCountries.mockResolvedValueOnce({ data: [] });
 
-  renderWithProviders(<App />);
+    renderWithProviders(<App />);
 
-  const emptyMessage = await screen.findByText(/no countries available/i);
-  expect(emptyMessage).toBeInTheDocument();
-});
+    const emptyMessage = await screen.findByText(/no countries available/i);
+    expect(emptyMessage).toBeInTheDocument();
+  });
 
-test('Muestra el enlace "Learn React"', () => {
-  renderWithProviders(<App />);
+  test('Muestra el enlace "Learn React"', async () => {
+    renderWithProviders(<App />);
 
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+    const linkElement = await screen.findByText(/learn react/i);
+    expect(linkElement).toBeInTheDocument();
+  });
 });

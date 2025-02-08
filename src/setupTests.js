@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import axios from 'axios';
+//import axios from 'axios';
 
 // Mock de axios
 jest.mock('axios', () => ({
