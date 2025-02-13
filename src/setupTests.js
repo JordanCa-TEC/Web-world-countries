@@ -1,4 +1,9 @@
 import '@testing-library/jest-dom';
+
+
+process.env.NODE_ENV = 'test';
+
+import '@testing-library/jest-dom';
 //import axios from 'axios';
 
 // Mock de axios
@@ -13,3 +18,4 @@ jest.mock('./api/countriesAPI', () => ({
   fetchCountryDetails: jest.fn().mockResolvedValue({ data: {} }), 
   fetchCountryRisk: jest.fn().mockResolvedValue({ data: {} }), 
 }));
+

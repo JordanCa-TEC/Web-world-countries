@@ -4,20 +4,22 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
+    "@testing-library/react": "^16.2.0",
     "axios": "^1.7.9",
     "cra-template-redux": "2.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
+    "redux-mock-store": "^1.5.5",
     "sass": "^1.83.4",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "cross-env NODE_ENV=test react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -43,10 +45,11 @@
     "@babel/preset-env": "^7.26.7",
     "@babel/preset-react": "^7.26.3",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
     "@types/react-router-dom": "^5.3.3",
     "axios-mock-adapter": "^2.1.0",
-    "babel-jest": "^24.9.0",
-    "jest": "27.5.1"
+    "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "react-router-dom": "^7.1.5"
   }
 }
