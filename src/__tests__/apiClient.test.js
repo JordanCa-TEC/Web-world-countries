@@ -5,7 +5,7 @@ import {
   fetchCountryByCode,
   fetchCountryByCurrency,
   fetchCountryByLanguage,
-} from './apiClient';
+} from '../api/countriesAPI';
 
 describe('API Client Tests', () => {
   let mock;
