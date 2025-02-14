@@ -1,8 +1,8 @@
-import { fetchCountryByRegion } from './api/countriesAPI';
+import { fetchCountryByRegion } from '../api/countriesAPI';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { store } from './app/store';
-import App from './App';
+import { store } from '../app/store';
+import App from '../App';
 
 // Mock de la función que llama a la API
 jest.mock('./api/countriesAPI', () => ({
