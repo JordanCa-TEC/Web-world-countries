@@ -1,44 +1,64 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fetchCountryByRegion } from './api/countriesAPI';  // Actualiza esto con la función correcta
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { store } from './app/store';  
-import { BrowserRouter } from 'react-router-dom';
+import { store } from './app/store';
 import App from './App';
-import { fetchCountries } from './api/countriesAPI';
 
-jest.mock('./api/countriesAPI');
+// Mock de la función que llama a la API
+jest.mock('./api/countriesAPI', () => ({
+  fetchCountryByRegion: jest.fn(), // Aquí puedes mockear la función que estés usando en el componente
+}));
 
-// Función reutilizable para renderizar con Redux y React Router
 const renderWithProviders = (ui) => {
   return render(
     <Provider store={store}>
-      <BrowserRouter>{ui}</BrowserRouter>
+      {ui}
     </Provider>
   );
 };
 
-// Limpiar mocks antes de cada prueba
 beforeEach(() => {
-  jest.clearAllMocks();
+  jest.clearAllMocks();  // Limpia cualquier mock previo
 });
 
 describe('App Component', () => {
   test('Muestra mensaje cuando no hay países disponibles', async () => {
-    // Mockea la respuesta vacía de fetchCountries
-    fetchCountries.mockResolvedValueOnce({ data: [] });
+    // Simula una respuesta vacía
+    fetchCountryByRegion.mockResolvedValue([]);
 
     renderWithProviders(<App />);
 
-    // Espera y busca el mensaje en pantalla
-    const emptyMessage = await screen.findByText(/no countries available/i);
-    expect(emptyMessage).toBeInTheDocument();
+    await waitFor(() => {
+      // Espera que el mensaje "no hay países disponibles" sea visible
+      expect(screen.getByText(/no hay países disponibles/i)).toBeInTheDocument();
+    });
   });
 
-  test('Muestra el enlace "Learn React"', async () => {
+  test('Muestra mensaje de error si la API falla', async () => {
+    // Simula una respuesta con error
+    fetchCountryByRegion.mockRejectedValue(new Error('Error al cargar los países'));
+
     renderWithProviders(<App />);
 
-    // Espera y busca el enlace en pantalla
-    const linkElement = await screen.findByText(/learn react/i);
-    expect(linkElement).toBeInTheDocument();
+    await waitFor(() => {
+      // Espera que el mensaje de error sea visible
+      expect(screen.getByText(/error al cargar los países/i)).toBeInTheDocument();
+    });
+  });
+
+  test('Muestra la lista de países correctamente', async () => {
+    // Simula una respuesta con datos de países
+    fetchCountryByRegion.mockResolvedValue([
+      { name: { common: 'Argentina' } },
+      { name: { common: 'Brasil' } },
+    ]);
+
+    renderWithProviders(<App />);
+
+    await waitFor(() => {
+      // Espera que los nombres de los países sean visibles
+      expect(screen.getByText(/argentina/i)).toBeInTheDocument();
+      expect(screen.getByText(/brasil/i)).toBeInTheDocument();
+    });
   });
 });
