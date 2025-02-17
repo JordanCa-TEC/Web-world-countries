@@ -45,31 +45,32 @@ export const countriesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchAllCountries.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(fetchAllCountries.fulfilled, (state, action) => {
-        state.status = 'succeeded';  // Cambiado a 'succeeded' cuando la operación es exitosa
+    const handlePending = (state) => {
+      state.status = 'loading';
+      state.error = null;
+    };
+
+    const handleFulfilled = (state, action, type) => {
+      state.status = 'succeeded';
+      if (type === 'fetchAllCountries') {
         state.countries = action.payload;
-      })
-      .addCase(fetchAllCountries.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      })
-      .addCase(fetchCountryDetails.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(fetchCountryDetails.fulfilled, (state, action) => {
-        state.status = 'succeeded';  // Cambiado a 'succeeded' para reflejar éxito
+      } else if (type === 'fetchCountryDetails') {
         state.countryDetails = action.payload;
-      })
-      .addCase(fetchCountryDetails.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
+      }
+    };
+
+    const handleRejected = (state, action) => {
+      state.status = 'failed';
+      state.error = action.error.message;
+    };
+
+    builder
+      .addCase(fetchAllCountries.pending, handlePending)
+      .addCase(fetchAllCountries.fulfilled, (state, action) => handleFulfilled(state, action, 'fetchAllCountries'))
+      .addCase(fetchAllCountries.rejected, handleRejected)
+      .addCase(fetchCountryDetails.pending, handlePending)
+      .addCase(fetchCountryDetails.fulfilled, (state, action) => handleFulfilled(state, action, 'fetchCountryDetails'))
+      .addCase(fetchCountryDetails.rejected, handleRejected);
   },
 });
 
