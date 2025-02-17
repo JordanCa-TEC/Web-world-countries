@@ -1,4 +1,10 @@
 module.exports = {
+
+  testMatch: [
+    "<rootDir>/src/**/*.{test.js, test.jsx, test.ts, test.tsx}",
+    "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+  ],
+  
   // Configuración para el mapeo de módulos (si es necesario)
   moduleNameMapper: {
     '^react-router-dom$': '<rootDir>/node_modules/react-router-dom',
@@ -20,6 +26,6 @@ module.exports = {
 
   // Evita que Jest ignore la transformación de axios en node_modules
   transformIgnorePatterns: [
-    "/node_modules/(?!axios)"
+    "/node_modules/(?!axios|other-modules-to-transform)"
   ],
 };

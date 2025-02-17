@@ -53,6 +53,7 @@ const CountryDetails = () => {
       {/* Mapa sin API */}
       <div className="map-container">
         <iframe
+          title="mapa-del-pais"
           src={`https://www.google.com/maps?q=${name?.common}&output=embed`}
           allowFullScreen
           loading="lazy"

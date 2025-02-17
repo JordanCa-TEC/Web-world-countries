@@ -1,92 +1,183 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import { configureStore } from "@reduxjs/toolkit";
+import React from 'react';
+import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
-import configureStore from "redux-mock-store";
+import { MemoryRouter, useParams } from "react-router-dom";
 import CountryDetails from "../pages/CountryDetails";
+import countriesSlice from "../redux/slices/countriesSlice";
 
-// Crear un mock de Redux
-const mockStore = configureStore([]);
+// Configuración del store para las pruebas
+const configureMockStore = (initialState = {}) => {
+  return configureStore({
+    reducer: {
+      countries: countriesSlice.reducer,
+    },
+    preloadedState: initialState,
+  });
+};
+
+// Mockear useParams
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useParams: jest.fn(),
+}));
 
 describe("CountryDetails Component", () => {
   let store;
 
   beforeEach(() => {
-    store = mockStore({
-      countries: {
-        countryDetails: {
-          name: { common: "Argentina" },
-          flags: { png: "https://flagcdn.com/w320/ar.png" },
-          area: 2780400,
-          population: 45376763,
-          timezones: ["UTC-03:00"],
-          capital: ["Buenos Aires"],
-          region: "América del Sur",
-          languages: { spa: "Español" },
-          currencies: { ARS: { name: "Peso argentino" } },
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  test("renders loading state", async () => {
+    try {
+      // Configurar el store con estado de carga
+      store = configureMockStore({
+        countries: {
+          countryDetails: null,
+          status: "loading",
+          error: null,
         },
-        status: "succeeded",
-        error: null,
-      },
-    });
-    store.dispatch = jest.fn();
+      });
+
+      // Mockear useParams para retornar un código de país
+      useParams.mockImplementation(() => ({ code: "ARG" }));
+
+      const { unmount } = render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <CountryDetails />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      // Verificación del estado de carga
+      expect(screen.getByText("Cargando información del país...")).toBeInTheDocument();
+
+      // Limpia el componente después de la prueba
+      unmount();
+    } catch (error) {
+      console.error("Error en la prueba de estado de carga:", error);
+      throw error;
+    }
   });
 
-  test("Muestra el mensaje de carga cuando está cargando", () => {
-    store = mockStore({
-      countries: { status: "loading", countryDetails: {} },
-    });
+  test("renders error state", async () => {
+    try {
+      // Configurar el store con estado de error
+      store = configureMockStore({
+        countries: {
+          countryDetails: null,
+          status: "failed",
+          error: "Error al cargar los datos",
+        },
+      });
 
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={["/country/ARG"]}>
-          <Routes>
-            <Route path="/country/:code" element={<CountryDetails />} />
-          </Routes>
-        </MemoryRouter>
-      </Provider>
-    );
+      useParams.mockImplementation(() => ({ code: "ARG" }));
 
-    expect(screen.getByText("Cargando información del país...")).toBeInTheDocument(); // Mensaje de carga cuando el estado es "loading"
+      const { unmount } = render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <CountryDetails />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      // Verificación del estado de error
+      expect(screen.getByText("Error al cargar la información: Error al cargar los datos")).toBeInTheDocument();
+
+      unmount();
+    } catch (error) {
+      console.error("Error en la prueba de estado de error:", error);
+      throw error;
+    }
   });
 
-  test("Muestra un mensaje de error si falla la carga", () => {
-    store = mockStore({
-      countries: { status: "failed", error: "Error al cargar", countryDetails: {} },
-    });
+  test("renders no data found state", async () => {
+    try {
+      // Configurar el store con estado exitoso pero sin datos
+      store = configureMockStore({
+        countries: {
+          countryDetails: null,
+          status: "succeeded",
+          error: null,
+        },
+      });
 
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={["/country/ARG"]}>
-          <Routes>
-            <Route path="/country/:code" element={<CountryDetails />} />
-          </Routes>
-        </MemoryRouter>
-      </Provider>
-    );
+      useParams.mockImplementation(() => ({ code: "ARG" }));
 
-    expect(screen.getByText("Error al cargar la información: Error al cargar")).toBeInTheDocument(); // Mensaje de error
+      const { unmount } = render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <CountryDetails />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      // Verificación del estado sin datos
+      expect(screen.getByText("No se encontró información para este país.")).toBeInTheDocument();
+
+      unmount();
+    } catch (error) {
+      console.error("Error en la prueba de estado sin datos:", error);
+      throw error;
+    }
   });
 
-  test("Renderiza correctamente los detalles del país", () => {
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={["/country/ARG"]}>
-          <Routes>
-            <Route path="/country/:code" element={<CountryDetails />} />
-          </Routes>
-        </MemoryRouter>
-      </Provider>
-    );
+  test("renders country details when data is available", async () => {
+    try {
+      // Configurar el store con datos del país
+      store = configureMockStore({
+        countries: {
+          countryDetails: {
+            name: { common: "Argentina" },
+            flags: { svg: "arg.svg" },
+            area: 2780000,
+            population: 45000000,
+            timezones: ["America/Argentina/Buenos_Aires"],
+            capital: ["Buenos Aires"],
+            region: "Americas",
+            languages: { spa: "Español" },
+            currencies: { ARS: { name: "Peso argentino" } },
+          },
+          status: "succeeded",
+          error: null,
+        },
+      });
 
-    // Verificar que todos los detalles del país se muestran correctamente
-    expect(screen.getByText("Argentina")).toBeInTheDocument();
-    expect(screen.getByText("Área: 2780400 km²")).toBeInTheDocument();
-    expect(screen.getByText("Población: 45376763")).toBeInTheDocument();
-    expect(screen.getByText("Huso horario: UTC-03:00")).toBeInTheDocument();
-    expect(screen.getByText("Capital: Buenos Aires")).toBeInTheDocument();
-    expect(screen.getByText("Región: América del Sur")).toBeInTheDocument();
-    expect(screen.getByText("Idiomas: Español")).toBeInTheDocument();
-    expect(screen.getByText("Monedas: Peso argentino")).toBeInTheDocument();
+      useParams.mockImplementation(() => ({ code: "ARG" }));
+
+      const { unmount } = render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <CountryDetails />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      // Verificaciones de los datos del país
+      await waitFor(() => {
+        expect(screen.getByText("Argentina")).toBeInTheDocument();
+        expect(screen.getByAltText("Bandera de Argentina")).toBeInTheDocument();
+        expect(screen.getByText("Área: 2780000 km²")).toBeInTheDocument();
+        expect(screen.getByText("Población: 45000000")).toBeInTheDocument();
+        expect(screen.getByText("Huso horario: America/Argentina/Buenos_Aires")).toBeInTheDocument();
+        expect(screen.getByText("Capital: Buenos Aires")).toBeInTheDocument();
+        expect(screen.getByText("Región: Americas")).toBeInTheDocument();
+        expect(screen.getByText("Idiomas: Español")).toBeInTheDocument();
+        expect(screen.getByText("Monedas: Peso argentino")).toBeInTheDocument();
+      });
+
+      unmount();
+    } catch (error) {
+      console.error("Error en la prueba de detalles del país:", error);
+      throw error;
+    }
   });
 });

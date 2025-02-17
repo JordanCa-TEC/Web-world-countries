@@ -5,6 +5,7 @@ const GiferEmbed = () => {
   return (
     <div className='gifanimated'>
       <iframe
+        title="world"
         src="https://gifer.com/embed/2rRT"
         width="800px"
         height="600px"

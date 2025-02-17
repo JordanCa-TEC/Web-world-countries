@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllCountries } from "../redux/slices/countriesSlice";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../components/SearchBar.jsx";
 import { Link } from "react-router-dom";
 import logo from '../assets/LOGO-WORLD-SEEK.svg';
 import "../styles/main.scss";

@@ -1,89 +1,126 @@
-import reducer, {
+import { configureStore } from '@reduxjs/toolkit';
+import axios from 'axios';
+import {
   fetchAllCountries,
   fetchCountryDetails,
   setError,
-} from '../redux/slices/countriesSlice';
-import { configureStore } from '@reduxjs/toolkit';
-import thunk from 'redux-thunk';
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
+  selectCountries,
+  selectCountryDetails,
+  selectCountriesStatus,
+  selectCountriesError,
+} from './countriesSlice';
 
-// Crear un mock de axios
-const mock = new MockAdapter(axios);
-
-// Estado inicial
-const initialState = {
-  countries: [],
-  countryDetails: null,
-  status: 'idle',  // Este estado se actualizará según las acciones
-  error: null,
-};
-
-describe('countriesSlice', () => {
+describe('Countries Slice', () => {
   let store;
 
   beforeEach(() => {
     store = configureStore({
-      reducer,
-      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+      reducer: {
+        countries: countriesSlice.reducer,
+      },
     });
   });
 
   afterEach(() => {
-    mock.reset();
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
-  test('debe retornar el estado inicial', () => {
-    expect(reducer(undefined, {})).toEqual(initialState);
+  describe('Initial State', () => {
+    it('should have initial state', () => {
+      expect(selectCountries(store.getState())).toEqual([]);
+      expect(selectCountryDetails(store.getState())).toBeNull();
+      expect(selectCountriesStatus(store.getState())).toBe('idle');
+      expect(selectCountriesError(store.getState())).toBeNull();
+    });
   });
 
-  test('debe manejar la acción setError', () => {
-    const errorMessage = 'Hubo un error';
-    const nextState = reducer(initialState, setError(errorMessage));
-    expect(nextState.error).toBe(errorMessage);
+  describe('fetchAllCountries', () => {
+    it('should handle fetchAllCountries pending', async () => {
+      const mockResponse = [{ name: { common: 'Test Country' }, cca3: 'TC' }];
+      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: mockResponse });
+
+      await store.dispatch(fetchAllCountries());
+      
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('loading');
+      expect(selectCountriesError(store.getState())).toBeNull();
+
+      mockGet.mockRestore();
+    });
+
+    it('should handle fetchAllCountries fulfilled', async () => {
+      const mockResponse = [{ name: { common: 'Test Country' }, cca3: 'TC' }];
+      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: mockResponse });
+
+      await store.dispatch(fetchAllCountries());
+      
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('succeeded');
+      expect(selectCountries(store.getState())).toEqual(mockResponse);
+    });
+
+    it('should handle fetchAllCountries rejected', async () => {
+      const mockError = new Error('Network Error');
+      const mockGet = jest.spyOn(axios.get, 'get').mockRejectedValueOnce(mockError);
+
+      await expect(store.dispatch(fetchAllCountries())).rejects.toThrow(
+        expect.objectContaining({
+          message: expect.stringContaining('No se pudo obtener la lista de países'),
+        })
+      );
+
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('failed');
+      expect(selectCountriesError(store.getState())).toMatch(/No se pudo obtener la lista de países/);
+    });
   });
 
-  test('fetchAllCountries debe cambiar el estado al cumplirse', async () => {
-    const fakeCountries = [{ name: { common: 'Peru' } }, { name: { common: 'Argentina' } }];
-    mock.onGet('https://restcountries.com/v3.1/all').reply(200, fakeCountries);
+  describe('fetchCountryDetails', () => {
+    it('should handle fetchCountryDetails pending', async () => {
+      const mockResponse = { name: { common: 'Test Country' }, cca3: 'TC' };
+      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: [mockResponse] });
 
-    await store.dispatch(fetchAllCountries());
-    const state = store.getState();
+      await store.dispatch(fetchCountryDetails('TC'));
+      
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('loading');
+      expect(selectCountriesError(store.getState())).toBeNull();
+    });
 
-    expect(state.countries).toEqual(fakeCountries);
-    expect(state.status).toBe('succeeded');  // Cambiar a 'succeeded' cuando la operación es exitosa
-    expect(state.error).toBeNull();
+    it('should handle fetchCountryDetails fulfilled', async () => {
+      const mockResponse = { name: { common: 'Test Country' }, cca3: 'TC' };
+      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: [mockResponse] });
+
+      await store.dispatch(fetchCountryDetails('TC'));
+      
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('succeeded');
+      expect(selectCountryDetails(store.getState())).toEqual(mockResponse);
+    });
+
+    it('should handle fetchCountryDetails rejected', async () => {
+      const mockError = new Error('Network Error');
+      const mockGet = jest.spyOn(axios.get, 'get').mockRejectedValueOnce(mockError);
+
+      await expect(store.dispatch(fetchCountryDetails('TC'))).rejects.toThrow(
+        expect.objectContaining({
+          message: expect.stringContaining('No se pudo obtener los detalles del país'),
+        })
+      );
+
+      expect(mockGet).toHaveBeenCalled();
+      expect(selectCountriesStatus(store.getState())).toBe('failed');
+      expect(selectCountriesError(store.getState())).toMatch(/No se pudo obtener los detalles del país/);
+    });
   });
 
-  test('fetchAllCountries debe manejar errores', async () => {
-    mock.onGet('https://restcountries.com/v3.1/all').reply(500);
-
-    await store.dispatch(fetchAllCountries());
-    const state = store.getState();
-
-    expect(state.status).toBe('failed');  // Cambiar a 'failed' cuando ocurre un error
-    expect(state.error).toBeDefined();
-  });
-
-  test('fetchCountryDetails debe cambiar el estado al cumplirse', async () => {
-    const fakeCountry = { name: { common: 'Peru' }, cca3: 'PER' };
-    mock.onGet('https://restcountries.com/v3.1/alpha/PER').reply(200, [fakeCountry]);
-
-    await store.dispatch(fetchCountryDetails('PER'));
-    const state = store.getState();
-
-    expect(state.countryDetails).toEqual(fakeCountry);
-    expect(state.status).toBe('succeeded');  // Cambiar a 'succeeded' al cumplirse
-    expect(state.error).toBeNull();
-  });
-
-  test('fetchCountryDetails debe manejar errores', async () => {
-    mock.onGet('https://restcountries.com/v3.1/alpha/PER').reply(404);
-
-    await store.dispatch(fetchCountryDetails('PER'));
-    const state = store.getState();
-
-    expect(state.status).toBe('failed');  // Cambiar a 'failed' cuando ocurre un error
-    expect(state.error).toBeDefined();
+  describe('setError', () => {
+    it('should update error state', () => {
+      const mockError = 'Test Error';
+      store.dispatch(setError(mockError));
+      
+      expect(selectCountriesError(store.getState())).toBe(mockError);
+    });
   });
 });

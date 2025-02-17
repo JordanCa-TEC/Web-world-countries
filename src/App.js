@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import CountryDetails from "./pages/CountryDetails";
-import CountryAbout from "./pages/CountryAbout";
-import Footer from "./components/footer";
+import Home from "./pages/Home.jsx";
+import CountryDetails from "./pages/CountryDetails.jsx";
+import CountryAbout from "./pages/CountryAbout.jsx";
+import Footer from "./components/footer.jsx";
 
 const App = () => (
   <BrowserRouter>
