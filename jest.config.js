@@ -9,4 +9,10 @@ module.exports = {
 
   // Configuración del archivo de setup para Jest
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\.jsx?$": "babel-jest"
+  },
+
 };
