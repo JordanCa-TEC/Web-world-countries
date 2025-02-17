@@ -5,7 +5,7 @@ import axios from 'axios';
 const initialState = {
   countries: [],        // Lista de todos los países
   countryDetails: null, // Detalles de un país específico
-  status: 'idle',       // Estado de la solicitud (idle, loading, failed)
+  status: 'idle',       // Estado de la solicitud (idle, loading, failed, succeeded)
   error: null,          // Para manejar los errores
 };
 
@@ -51,7 +51,7 @@ export const countriesSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAllCountries.fulfilled, (state, action) => {
-        state.status = 'idle';
+        state.status = 'succeeded';  // Cambiado a 'succeeded' cuando la operación es exitosa
         state.countries = action.payload;
       })
       .addCase(fetchAllCountries.rejected, (state, action) => {
@@ -63,8 +63,8 @@ export const countriesSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCountryDetails.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.countryDetails = action.payload; // Ya está asegurado que es un solo objeto
+        state.status = 'succeeded';  // Cambiado a 'succeeded' para reflejar éxito
+        state.countryDetails = action.payload;
       })
       .addCase(fetchCountryDetails.rejected, (state, action) => {
         state.status = 'failed';

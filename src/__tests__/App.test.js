@@ -1,6 +1,4 @@
-// Importamos todos los tests de la carpeta __tests__
 import './apiClient.test.js';
-import './Counter.test.js';
 import './countriesSlice.test.js';
 import './CountryDetails.test.js';
 import './Home.test.js';

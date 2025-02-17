@@ -10,9 +10,16 @@ module.exports = {
   // Configuración del archivo de setup para Jest
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
 
+  // Configuración del entorno de pruebas
   testEnvironment: "jsdom",
+
+  // Transforma archivos JavaScript con Babel
   transform: {
-    "^.+\\.jsx?$": "babel-jest"
+    "^.+\\.jsx?$": "babel-jest",
   },
 
+  // Evita que Jest ignore la transformación de axios en node_modules
+  transformIgnorePatterns: [
+    "/node_modules/(?!axios)"
+  ],
 };

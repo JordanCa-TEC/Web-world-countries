@@ -1,111 +1,89 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
-import { Counter } from "../Counter";
-import {
-  decrement,
-  increment,
-  incrementByAmount,
-  incrementAsync,
-  incrementIfOdd,
-} from "../counterSlice";
+import reducer, {
+  fetchAllCountries,
+  fetchCountryDetails,
+  setError,
+} from '../redux/slices/countriesSlice';
+import { configureStore } from '@reduxjs/toolkit';
+import thunk from 'redux-thunk';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
-const mockStore = configureStore([]);
+// Crear un mock de axios
+const mock = new MockAdapter(axios);
 
-describe("Counter Component", () => {
+// Estado inicial
+const initialState = {
+  countries: [],
+  countryDetails: null,
+  status: 'idle',  // Este estado se actualizará según las acciones
+  error: null,
+};
+
+describe('countriesSlice', () => {
   let store;
 
   beforeEach(() => {
-    store = mockStore({
-      counter: { value: 0 },
+    store = configureStore({
+      reducer,
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
     });
-    store.dispatch = jest.fn();
   });
 
-  test("Renderiza el contador correctamente", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
-
-    expect(screen.getByText("0")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /decrement value/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /increment value/i })).toBeInTheDocument();
+  afterEach(() => {
+    mock.reset();
   });
 
-  test("Incrementa el contador cuando se hace clic en +", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
-
-    const incrementButton = screen.getByRole("button", { name: /increment value/i });
-    fireEvent.click(incrementButton);
-
-    expect(store.dispatch).toHaveBeenCalledWith(increment());
+  test('debe retornar el estado inicial', () => {
+    expect(reducer(undefined, {})).toEqual(initialState);
   });
 
-  test("Decrementa el contador cuando se hace clic en -", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
-
-    const decrementButton = screen.getByRole("button", { name: /decrement value/i });
-    fireEvent.click(decrementButton);
-
-    expect(store.dispatch).toHaveBeenCalledWith(decrement());
+  test('debe manejar la acción setError', () => {
+    const errorMessage = 'Hubo un error';
+    const nextState = reducer(initialState, setError(errorMessage));
+    expect(nextState.error).toBe(errorMessage);
   });
 
-  test("Modifica el input y ejecuta incrementByAmount correctamente", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+  test('fetchAllCountries debe cambiar el estado al cumplirse', async () => {
+    const fakeCountries = [{ name: { common: 'Peru' } }, { name: { common: 'Argentina' } }];
+    mock.onGet('https://restcountries.com/v3.1/all').reply(200, fakeCountries);
 
-    const input = screen.getByLabelText("Set increment amount");
-    fireEvent.change(input, { target: { value: "5" } });
+    await store.dispatch(fetchAllCountries());
+    const state = store.getState();
 
-    const addAmountButton = screen.getByText("Add Amount");
-    fireEvent.click(addAmountButton);
-
-    expect(store.dispatch).toHaveBeenCalledWith(incrementByAmount(5));
+    expect(state.countries).toEqual(fakeCountries);
+    expect(state.status).toBe('succeeded');  // Cambiar a 'succeeded' cuando la operación es exitosa
+    expect(state.error).toBeNull();
   });
 
-  test("Ejecuta incrementAsync correctamente", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+  test('fetchAllCountries debe manejar errores', async () => {
+    mock.onGet('https://restcountries.com/v3.1/all').reply(500);
 
-    const input = screen.getByLabelText("Set increment amount");
-    fireEvent.change(input, { target: { value: "3" } });
+    await store.dispatch(fetchAllCountries());
+    const state = store.getState();
 
-    const asyncButton = screen.getByText("Add Async");
-    fireEvent.click(asyncButton);
-
-    expect(store.dispatch).toHaveBeenCalledWith(incrementAsync(3));
+    expect(state.status).toBe('failed');  // Cambiar a 'failed' cuando ocurre un error
+    expect(state.error).toBeDefined();
   });
 
-  test("Ejecuta incrementIfOdd correctamente", () => {
-    render(
-      <Provider store={store}>
-        <Counter />
-      </Provider>
-    );
+  test('fetchCountryDetails debe cambiar el estado al cumplirse', async () => {
+    const fakeCountry = { name: { common: 'Peru' }, cca3: 'PER' };
+    mock.onGet('https://restcountries.com/v3.1/alpha/PER').reply(200, [fakeCountry]);
 
-    const input = screen.getByLabelText("Set increment amount");
-    fireEvent.change(input, { target: { value: "7" } });
+    await store.dispatch(fetchCountryDetails('PER'));
+    const state = store.getState();
 
-    const oddButton = screen.getByText("Add If Odd");
-    fireEvent.click(oddButton);
+    expect(state.countryDetails).toEqual(fakeCountry);
+    expect(state.status).toBe('succeeded');  // Cambiar a 'succeeded' al cumplirse
+    expect(state.error).toBeNull();
+  });
 
-    expect(store.dispatch).toHaveBeenCalledWith(incrementIfOdd(7));
+  test('fetchCountryDetails debe manejar errores', async () => {
+    mock.onGet('https://restcountries.com/v3.1/alpha/PER').reply(404);
+
+    await store.dispatch(fetchCountryDetails('PER'));
+    const state = store.getState();
+
+    expect(state.status).toBe('failed');  // Cambiar a 'failed' cuando ocurre un error
+    expect(state.error).toBeDefined();
   });
 });

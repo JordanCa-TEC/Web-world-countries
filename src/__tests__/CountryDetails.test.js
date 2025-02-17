@@ -33,7 +33,9 @@ describe("CountryDetails Component", () => {
   });
 
   test("Muestra el mensaje de carga cuando está cargando", () => {
-    store = mockStore({ countries: { status: "loading" } });
+    store = mockStore({
+      countries: { status: "loading", countryDetails: {} },
+    });
 
     render(
       <Provider store={store}>
@@ -45,11 +47,13 @@ describe("CountryDetails Component", () => {
       </Provider>
     );
 
-    expect(screen.getByText("Cargando información del país...")).toBeInTheDocument();
+    expect(screen.getByText("Cargando información del país...")).toBeInTheDocument(); // Mensaje de carga cuando el estado es "loading"
   });
 
   test("Muestra un mensaje de error si falla la carga", () => {
-    store = mockStore({ countries: { status: "failed", error: "Error al cargar" } });
+    store = mockStore({
+      countries: { status: "failed", error: "Error al cargar", countryDetails: {} },
+    });
 
     render(
       <Provider store={store}>
@@ -61,7 +65,7 @@ describe("CountryDetails Component", () => {
       </Provider>
     );
 
-    expect(screen.getByText("Error al cargar la información: Error al cargar")).toBeInTheDocument();
+    expect(screen.getByText("Error al cargar la información: Error al cargar")).toBeInTheDocument(); // Mensaje de error
   });
 
   test("Renderiza correctamente los detalles del país", () => {
@@ -75,6 +79,7 @@ describe("CountryDetails Component", () => {
       </Provider>
     );
 
+    // Verificar que todos los detalles del país se muestran correctamente
     expect(screen.getByText("Argentina")).toBeInTheDocument();
     expect(screen.getByText("Área: 2780400 km²")).toBeInTheDocument();
     expect(screen.getByText("Población: 45376763")).toBeInTheDocument();

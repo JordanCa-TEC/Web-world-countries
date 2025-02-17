@@ -31,7 +31,7 @@ describe("Home Component", () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText("Busca un país...")).toBeInTheDocument();
+    expect(screen.getByText("Busca un país...")).toBeInTheDocument(); // Verifica que el campo de búsqueda esté en el DOM
   });
 
   test("muestra mensaje de carga cuando está en estado 'loading'", () => {
@@ -46,7 +46,7 @@ describe("Home Component", () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText("Cargando países...")).toBeInTheDocument();
+    expect(screen.getByText("Cargando países...")).toBeInTheDocument(); // Verifica que se muestre el mensaje de carga
   });
 
   test("muestra mensaje de error cuando falla la carga", () => {
@@ -61,7 +61,7 @@ describe("Home Component", () => {
         </MemoryRouter>
       </Provider>
     );
-    expect(screen.getByText("Error al cargar los países: Error de red")).toBeInTheDocument();
+    expect(screen.getByText("Error al cargar los países: Error de red")).toBeInTheDocument(); // Verifica que se muestre el error
   });
 
   test("filtra correctamente los países", () => {
@@ -73,9 +73,9 @@ describe("Home Component", () => {
       </Provider>
     );
 
-    const input = screen.getByPlaceholderText("Busca un país...");
-    fireEvent.change(input, { target: { value: "Arg" } });
-    expect(screen.getByText("Argentina")).toBeInTheDocument();
-    expect(screen.queryByText("Brasil")).not.toBeInTheDocument();
+    const input = screen.getByPlaceholderText("Busca un país..."); // Obtén el campo de búsqueda por su placeholder
+    fireEvent.change(input, { target: { value: "Arg" } }); // Cambia el valor del input para filtrar países
+    expect(screen.getByText("Argentina")).toBeInTheDocument(); // Verifica que Argentina se muestra
+    expect(screen.queryByText("Brasil")).not.toBeInTheDocument(); // Verifica que Brasil no se muestra
   });
 });
