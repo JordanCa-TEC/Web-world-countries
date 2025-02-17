@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {
+import countriesSlice, {
   fetchAllCountries,
   fetchCountryDetails,
   setError,
@@ -8,7 +8,7 @@ import {
   selectCountryDetails,
   selectCountriesStatus,
   selectCountriesError,
-} from './countriesSlice';
+} from './countriesSlice.js'; 
 
 describe('Countries Slice', () => {
   let store;
@@ -16,7 +16,7 @@ describe('Countries Slice', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        countries: countriesSlice.reducer,
+        countries: countriesSlice.reducer, 
       },
     });
   });
@@ -38,7 +38,7 @@ describe('Countries Slice', () => {
   describe('fetchAllCountries', () => {
     it('should handle fetchAllCountries pending', async () => {
       const mockResponse = [{ name: { common: 'Test Country' }, cca3: 'TC' }];
-      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: mockResponse });
+      const mockGet = jest.spyOn(axios, 'get').mockResolvedValue({ data: mockResponse });
 
       await store.dispatch(fetchAllCountries());
       
@@ -51,7 +51,7 @@ describe('Countries Slice', () => {
 
     it('should handle fetchAllCountries fulfilled', async () => {
       const mockResponse = [{ name: { common: 'Test Country' }, cca3: 'TC' }];
-      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: mockResponse });
+      const mockGet = jest.spyOn(axios, 'get').mockResolvedValue({ data: mockResponse });
 
       await store.dispatch(fetchAllCountries());
       
@@ -62,7 +62,7 @@ describe('Countries Slice', () => {
 
     it('should handle fetchAllCountries rejected', async () => {
       const mockError = new Error('Network Error');
-      const mockGet = jest.spyOn(axios.get, 'get').mockRejectedValueOnce(mockError);
+      const mockGet = jest.spyOn(axios, 'get').mockRejectedValueOnce(mockError);
 
       await expect(store.dispatch(fetchAllCountries())).rejects.toThrow(
         expect.objectContaining({
@@ -79,7 +79,7 @@ describe('Countries Slice', () => {
   describe('fetchCountryDetails', () => {
     it('should handle fetchCountryDetails pending', async () => {
       const mockResponse = { name: { common: 'Test Country' }, cca3: 'TC' };
-      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: [mockResponse] });
+      const mockGet = jest.spyOn(axios, 'get').mockResolvedValue({ data: [mockResponse] });
 
       await store.dispatch(fetchCountryDetails('TC'));
       
@@ -90,7 +90,7 @@ describe('Countries Slice', () => {
 
     it('should handle fetchCountryDetails fulfilled', async () => {
       const mockResponse = { name: { common: 'Test Country' }, cca3: 'TC' };
-      const mockGet = jest.spyOn(axios.get, 'get').mockResolvedValue({ data: [mockResponse] });
+      const mockGet = jest.spyOn(axios, 'get').mockResolvedValue({ data: [mockResponse] });
 
       await store.dispatch(fetchCountryDetails('TC'));
       
@@ -101,7 +101,7 @@ describe('Countries Slice', () => {
 
     it('should handle fetchCountryDetails rejected', async () => {
       const mockError = new Error('Network Error');
-      const mockGet = jest.spyOn(axios.get, 'get').mockRejectedValueOnce(mockError);
+      const mockGet = jest.spyOn(axios, 'get').mockRejectedValueOnce(mockError);
 
       await expect(store.dispatch(fetchCountryDetails('TC'))).rejects.toThrow(
         expect.objectContaining({

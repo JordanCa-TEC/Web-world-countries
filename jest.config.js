@@ -1,10 +1,10 @@
 module.exports = {
-
+  // Especifica los patrones de búsqueda para los archivos de prueba
   testMatch: [
     "<rootDir>/src/**/*.{test.js, test.jsx, test.ts, test.tsx}",
     "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
   ],
-  
+
   // Configuración para el mapeo de módulos (si es necesario)
   moduleNameMapper: {
     '^react-router-dom$': '<rootDir>/node_modules/react-router-dom',
@@ -23,6 +23,9 @@ module.exports = {
   transform: {
     "^.+\\.jsx?$": "babel-jest",
   },
+
+  // Agregar extensión .js en los módulos
+  moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx', 'json', 'node'],
 
   // Evita que Jest ignore la transformación de axios en node_modules
   transformIgnorePatterns: [
