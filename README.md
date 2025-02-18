@@ -1,3 +1,6 @@
+# Figma
+https://www.figma.com/design/AyNGyrqbG6yZ9J4MUBHBxB/Pa%C3%ADses-en-el-mundo?m=auto&t=JQklgAnSAD6rjkSz-1
+
 # Prueba en Jest
 npm test -- --coverage --watch --verbose
 npm test -- --coverage --verbose --watchAll=false
