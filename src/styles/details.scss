@@ -94,7 +94,6 @@
 
       @include phone{
         font-size: 0.8rem;
- 
       }
     }
   
@@ -113,6 +112,10 @@
       height: 400px;  // Ajusta la altura según lo necesites
       border-radius: 10px;
       overflow: hidden;
+
+      @include tablet {
+        padding-bottom: 10em;
+      }
       
       iframe {
         width: 100%;
