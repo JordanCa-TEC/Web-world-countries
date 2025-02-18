@@ -29,6 +29,7 @@ module.exports = {
 
   // Evita que Jest ignore la transformación de axios en node_modules
   transformIgnorePatterns: [
-    "/node_modules/(?!axios|other-modules-to-transform)"
+    "/node_modules/(?!axios|other-modules-to-transform)",
+    "/src/pages/.*",
   ],
 };

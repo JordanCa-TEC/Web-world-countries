@@ -5,6 +5,13 @@
     }
   }
 
+  @mixin phone {
+    @media only screen and (max-width: 468px) {
+      @content;
+    }
+  }
+
+
 /*----------------------------------------*/
 .country-details {
     display: grid;
@@ -28,9 +35,16 @@
     transition: transform 0.2s, box-shadow 0.2s;
 
     @include tablet{
-        gap: 0;
-        padding: 0 0 40% 0;
+      grid-template-columns: 1fr;
+        max-width: none;
+        width: 100%;
+        gap: 0; 
+        padding: 0;
         margin: 0;
+    }
+
+    @include phone{
+      max-width:none;
     }
   
     h1 {
@@ -43,23 +57,44 @@
         width: 100%; 
         display: flex;
         justify-content: center;
+      
+        @include tablet{
+          font-size: 3em;
+        }
+
+        @include phone{
+          font-size: 2em;
+        }
     }
-  
+    
+    
+
     img {
       grid-area: flag;
       width: 100%;
       max-width: 580px;
       border-radius: 10px;
+
+      @include tablet{
+        width: 90%;
+      }
     }
   
     p {
       background: #c4c4c4;
       font-size: 1.7rem;
-      padding: 4%;
+      padding: 6%;
       border-radius: 5px;
 
       @include tablet{
-        padding: 3% 90% 3% 90%;
+        font-size: 1.2rem;
+        padding: 5% 5%;
+        width: 80%;
+      }
+
+      @include phone{
+        font-size: 0.8rem;
+ 
       }
     }
   
@@ -83,6 +118,10 @@
         width: 100%;
         height: 100%;
         border: none;
+
+        @include tablet{
+          width: 90%;
+        }
       }
     }
   

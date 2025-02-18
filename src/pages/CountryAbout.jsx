@@ -1,6 +1,6 @@
 // --- src/pages/About.jsx ---
 import React from "react";
-import GiferEmbed from "../components/world-animated.jsx"
+import GiferEmbed from "../assets/world-animated.jsx"
 
 const About = () => {
   return (
