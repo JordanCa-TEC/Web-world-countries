@@ -29,7 +29,20 @@ module.exports = {
 
   // Evita que Jest ignore la transformación de axios en node_modules
   transformIgnorePatterns: [
-    "/node_modules/(?!axios|other-modules-to-transform)",
-    "/src/pages/.*",
+    "/node_modules/(?!axios|other-modules-to-transform)"
   ],
+
+  // Configuración para la recopilación de cobertura
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "src/**/*.{js,jsx,ts,tsx}",
+    "!src/**/*.test.{js,jsx,ts,tsx}",
+    "!src/**/*.d.ts", // Si tienes archivos de definición
+  ],
+
+  // Cobertura de las páginas (si es necesario incluirlas)
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/src/pages/",  // Si deseas excluir las páginas, comenta esta línea si quieres incluirlas
+  ]
 };

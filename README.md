@@ -1,5 +1,7 @@
 # Prueba en Jest
 npm test -- --coverage --watch --verbose
+npm test -- --coverage --verbose --watchAll=false
+
 
 # Getting Started with Create React App and Redux
 
